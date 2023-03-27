@@ -10,9 +10,9 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { Bundler, IApproveToken, ITransaction, SignatureMode, SoulWalletLib, UserOperation, Signatures, IUserOpReceipt, IResult, IValidationResult, IFailedOp } from 'soul-wallet-lib';
-import { toNumber } from "soul-wallet-lib/dist/defines/numberLike";
-import { SoulWallet__factory, SignatureTest__factory } from "../src/types/index";
+import { Bundler, IApproveToken, ITransaction, SignatureMode, WalletLib, UserOperation, Signatures, IUserOpReceipt, IResult, IValidationResult, IFailedOp } from 'soul-wallet-lib';
+import { toNumber } from "wallet-lib/dist/defines/numberLike";
+import { Wallet__factory, SignatureTest__factory } from "../src/types/index";
 import { Utils } from "./Utils";
 
 
@@ -20,7 +20,7 @@ const log_on = false;
 const log = (message?: any, ...optionalParams: any[]) => { if (log_on) console.log(message, ...optionalParams) };
 
 
-describe("SoulWalletContract", function () {
+describe("WalletContract", function () {
 
     // We define a fixture to reuse the same setup in every test.
     // We use loadFixture to run this setup once, snapshot that state,
@@ -42,28 +42,28 @@ describe("SoulWalletContract", function () {
 
         // #region SingletonFactory 
 
-        let SingletonFactory: string = SoulWalletLib.Defines.SingletonFactoryAddress;
+        let SingletonFactory: string = WalletLib.Defines.SingletonFactoryAddress;
         let code = await ethers.provider.getCode(SingletonFactory);
         if (code === '0x') {
             SingletonFactory = (await (await ethers.getContractFactory("SingletonFactory")).deploy()).address;
             code = await ethers.provider.getCode(SingletonFactory);
             expect(code).to.not.equal('0x');
         }
-        const soulWalletLib = new SoulWalletLib(SingletonFactory);
+        const walletLib = new WalletLib(SingletonFactory);
 
         // #endregion
 
-        // #region SoulWalletLogic
-        const SoulWalletLogic = {
-            contract: await (await ethers.getContractFactory("SoulWallet")).deploy()
+        // #region WalletLogic
+        const WalletLogic = {
+            contract: await (await ethers.getContractFactory("Wallet")).deploy()
         };
-        log("SoulWalletLogic:", SoulWalletLogic.contract.address);
-        // get SoulWalletLogic contract code
-        const SoulWalletLogicCode = await ethers.provider.getCode(SoulWalletLogic.contract.address);
+        log("WalletLogic:", WalletLogic.contract.address);
+        // get WalletLogic contract code
+        const WalletLogicCode = await ethers.provider.getCode(WalletLogic.contract.address);
 
-        // calculate SoulWalletLogic contract code hash
-        const SoulWalletLogicCodeHash = ethers.utils.keccak256(SoulWalletLogicCode);
-        log("SoulWalletLogicCodeHash:", SoulWalletLogicCodeHash);
+        // calculate WalletLogic contract code hash
+        const WalletLogicCodeHash = ethers.utils.keccak256(WalletLogicCode);
+        log("WalletLogicCodeHash:", WalletLogicCodeHash);
         // #endregion
 
         // #region EntryPoint  
@@ -97,17 +97,17 @@ describe("SoulWalletContract", function () {
 
 
         // #region wallet factory
-        const _walletFactoryAddress = await soulWalletLib.Utils.deployFactory.deploy(SoulWalletLogic.contract.address, ethers.provider, accounts[0]);
+        const _walletFactoryAddress = await walletLib.Utils.deployFactory.deploy(WalletLogic.contract.address, ethers.provider, accounts[0]);
 
         const WalletFactory = {
-            contract: await ethers.getContractAt("SoulWalletFactory", _walletFactoryAddress)
+            contract: await ethers.getContractAt("WalletFactory", _walletFactoryAddress)
         };
-        log("SoulWalletFactory:", WalletFactory.contract.address);
+        log("WalletFactory:", WalletFactory.contract.address);
 
 
         // #endregion
 
-        const bundler = new soulWalletLib.Bundler(EntryPoint.contract.address, ethers.provider, EOA.privateKey);
+        const bundler = new walletLib.Bundler(EntryPoint.contract.address, ethers.provider, EOA.privateKey);
         await bundler.init();
 
 
