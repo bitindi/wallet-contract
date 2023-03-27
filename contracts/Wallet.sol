@@ -18,13 +18,13 @@ import "./utils/upgradeable/logicUpgradeControl.sol";
 import "./utils/upgradeable/Initializable.sol";
 
 /**
- * @author  soulwallet team.
+ * @author  bitindi team.
  * @title   an implementation of the ERC4337 smart contract wallet.
  * @dev     this is the implementation contract of the soul wallet. The contract support ERC4337 which can be called by the entrypoint contract with UserOperation.
  * @notice  .
  */
 
-contract SoulWallet is
+contract Wallet is
     BaseAccount,
     Initializable,
     GuardianControl,
