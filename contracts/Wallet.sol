@@ -74,7 +74,7 @@ contract Wallet is
     }
 
     /**
-     * @notice  initialized function to setup the soul wallet contract.
+     * @notice  initialized function to setup the wallet contract.
      * @dev     .
      * @param   _entryPoint  trused entrypoint.
      * @param   _owner  wallet sign key address.
@@ -368,7 +368,7 @@ contract Wallet is
     }
 
     /**
-     * @notice  change the soulwallet sign key.
+     * @notice  change the wallet sign key.
      * @dev     used for social recovery.
      * @param   newOwner  .
      */
