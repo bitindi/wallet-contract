@@ -5,24 +5,24 @@ pragma solidity ^0.8.17;
 /* solhint-disable no-inline-assembly */
 /* solhint-disable reason-string */
 
-import "./SoulWalletProxy.sol";
-import "./SoulWallet.sol";
+import "./WalletProxy.sol";
+import "./Wallet.sol";
 import "./interfaces/ICreate2Deployer.sol";
 
 /**
- * @author  soulwallet team.
- * @title   A factory contract to create soul wallet.
+ * @author  bitindi team.
+ * @title   A factory contract to create wallet.
  * @dev     it is called by the entrypoint which call the "initCode" factory to create and return the sender wallet address.
  * @notice  .
  */
 
-contract SoulWalletFactory {
+contract WalletFactory {
     address public immutable walletImpl;
     address public immutable singletonFactory;
     string public constant VERSION = "0.0.1";
     mapping(address => bool) public isWalletActive;
 
-    event SoulWalletCreated(
+    event WalletCreated(
         address indexed _proxy,
         address indexed _owner,
         address indexed _implementation,
@@ -37,7 +37,7 @@ contract SoulWalletFactory {
     }
 
     /**
-     * @notice  deploy the soul wallet contract using proxy and returns the address of the proxy.
+     * @notice  deploy the wallet contract using proxy and returns the address of the proxy.
      * @dev     should be called by entrypoint with useropeartoin.initcode > 0
      * @param   _entryPoint  .
      * @param   _owner  .
@@ -56,11 +56,11 @@ contract SoulWalletFactory {
         bytes32 _salt
     ) public returns (address) {
         bytes memory deploymentData = abi.encodePacked(
-            type(SoulWalletProxy).creationCode,
+            type(WalletProxy).creationCode,
             abi.encode(
                 walletImpl,
                 abi.encodeCall(
-                    SoulWallet.initialize,
+                    Wallet.initialize,
                     (
                         IEntryPoint(_entryPoint),
                         _owner,
@@ -77,14 +77,14 @@ contract SoulWalletFactory {
             _salt
         );
         require(proxy != address(0), "create2 failed");
-        emit SoulWalletCreated(proxy, _owner, walletImpl, VERSION);
+        emit WalletCreated(proxy, _owner, walletImpl, VERSION);
         isWalletActive[proxy] = true;
         return proxy;
     }
 
     /**
      * @notice  returns the proxy creationCode external method.
-     * @dev     used by soulwalletlib to calcudate the soul wallet address.
+     * @dev     used by walletlib to calcudate the wallet address.
      * @return  bytes  .
      */
     function proxyCode() external pure returns (bytes memory) {
@@ -97,11 +97,11 @@ contract SoulWalletFactory {
      * @return  bytes  .
      */
     function _proxyCode() private pure returns (bytes memory) {
-        return type(SoulWalletProxy).creationCode;
+        return type(WalletProxy).creationCode;
     }
 
     /**
-     * @notice  return the counterfactual address of soul wallet as it would be return by createWallet()
+     * @notice  return the counterfactual address of wallet as it would be return by createWallet()
      * @dev     .
      * @param   _entryPoint  entrypoint address.
      * @param   _owner  wallet sign key address.
@@ -109,7 +109,7 @@ contract SoulWalletFactory {
      * @param   _guardianDelay  the delay which update guardian take effect.
      * @param   _guardian  the guardian multi sig address.
      * @param   _salt  salt used by create2 opcode.
-     * @return  address  return computed soul wallet address.
+     * @return  address  return computed wallet address.
      */
     function getWalletAddress(
         address _entryPoint,
@@ -124,7 +124,7 @@ contract SoulWalletFactory {
             abi.encode(
                 walletImpl,
                 abi.encodeCall(
-                    SoulWallet.initialize,
+                    Wallet.initialize,
                     (
                         IEntryPoint(_entryPoint),
                         _owner,
