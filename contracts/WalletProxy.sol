@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 
 import "./utils/upgradeable/Upgradeable.sol";
 
-contract SoulWalletProxy is Upgradeable {
+contract WalletProxy is Upgradeable {
     /**
      * @dev Initializes the upgradeable proxy with an initial implementation specified by `logic`.
      *
