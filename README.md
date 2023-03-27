@@ -1,10 +1,8 @@
 <div align="center">
-  <h1 align="center">SoulWallet Contracts</h1>
+  <h1 align="center">Wallet Contracts</h1>
 </div>
 
-<div align="center">
-<img src="https://raw.githubusercontent.com/proofofsoulprotocol/soul-wallet-packages/main/src/assets/logo.svg">
-</div>
+
 
 ## Features
 + Support [ERC-4337: Account Abstraction](https://eips.ethereum.org/EIPS/eip-4337)
@@ -16,15 +14,15 @@
 
 Below is a brief overview of the repository contracts
 
-### SoulWalletFactory
+### WalletFactory
 
-"SoulWalletFactory" is a factory contract. It is used to create a new wallet contract. The wallet contract is created using the singleton contract with the CREATE2 opcode, which allows the wallet contract to be created with a deterministic address.
+"WalletFactory" is a factory contract. It is used to create a new wallet contract. The wallet contract is created using the singleton contract with the CREATE2 opcode, which allows the wallet contract to be created with a deterministic address.
 
-### SoulWalletProxy
-"SoulWalletProxy" is a proxy contract that manages the implementation contract address and is responsible for forwarding delegate calls to the implementation contract. Additionally, users' contract wallet data is stored in the proxy contract.
+### WalletProxy
+"WalletProxy" is a proxy contract that manages the implementation contract address and is responsible for forwarding delegate calls to the implementation contract. Additionally, users' contract wallet data is stored in the proxy contract.
 
-### SoulWallet
-"SoulWallet" is the implementation contract. It is responsible for the core logic of the wallet
+### Wallet
+"Wallet" is the implementation contract. It is responsible for the core logic of the wallet
 + Using diamond storage pattern to store the data. All contract data is stored in specific slots in the contract. This approach has the advantage of making it easier to upgrade the logic contract in the future while avoiding data conflicts in slots compare the default contract storage from slot 0.
 + Guardian management.
   1. The initial guardian settings take effect immediately. If guardians are updated, there is a time lock, meaning that changes will only take effect after the set time has passed.
