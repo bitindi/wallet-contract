@@ -10,7 +10,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { Bundler, IApproveToken, ITransaction, SignatureMode, WalletLib, UserOperation, Signatures, IUserOpReceipt, IResult, IValidationResult, IFailedOp } from 'soul-wallet-lib';
+import { Bundler, IApproveToken, ITransaction, SignatureMode, WalletLib, UserOperation, Signatures, IUserOpReceipt, IResult, IValidationResult, IFailedOp } from 'wallet-lib';
 import { toNumber } from "wallet-lib/dist/defines/numberLike";
 import { Wallet__factory, SignatureTest__factory } from "../src/types/index";
 import { Utils } from "./Utils";
@@ -164,13 +164,13 @@ describe("WalletContract", function () {
 
 
         return {
-            soulWalletLib,
+            walletLib,
             bundler,
             chainId,
             accounts,
             walletOwner,
             SingletonFactory,
-            SoulWalletLogic,
+            WalletLogic,
             EntryPoint,
             USDC,
             DAI,
@@ -195,7 +195,7 @@ describe("WalletContract", function () {
 
     async function activateWallet_withETH() {
         //describe("activate wallet", async () => {
-        const { soulWalletLib, bundler, chainId, accounts, SingletonFactory, walletOwner, SoulWalletLogic, EntryPoint, USDC, TokenPaymaster, GuardianLogic, EstimateGasHelper } = await loadFixture(deployFixture);
+        const { walletLib, bundler, chainId, accounts, SingletonFactory, walletOwner, WalletLogic, EntryPoint, USDC, TokenPaymaster, GuardianLogic, EstimateGasHelper } = await loadFixture(deployFixture);
 
         const upgradeDelay = 30;
         const guardianDelay = 30;
@@ -213,7 +213,7 @@ describe("WalletContract", function () {
         }
 
         const guardianSalt = 'saltText<text or bytes32>';
-        const gurdianAddressAndInitCode = soulWalletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
+        const gurdianAddressAndInitCode = walletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
         log('guardian address ==> ' + gurdianAddressAndInitCode.address);
         {
             // test guardian order (For user experience, guardian cannot rely on the order of address)
@@ -222,12 +222,12 @@ describe("WalletContract", function () {
             _guardiansAddress[0] = _guardiansAddress[1];
             _guardiansAddress[1] = _guardianTmpItem;
 
-            const _gurdianAddressAndInitCode = soulWalletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, _guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
+            const _gurdianAddressAndInitCode = walletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, _guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
             expect(_gurdianAddressAndInitCode.address).to.equal(gurdianAddressAndInitCode.address);
         }
 
-        const walletAddress = await soulWalletLib.calculateWalletAddress(
-            SoulWalletLogic.contract.address,
+        const walletAddress = await walletLib.calculateWalletAddress(
+            WalletLogic.contract.address,
             EntryPoint.contract.address,
             walletOwner.address,
             upgradeDelay,
@@ -240,8 +240,8 @@ describe("WalletContract", function () {
         //#region
 
 
-        const activateOp = soulWalletLib.activateWalletOp(
-            SoulWalletLogic.contract.address,
+        const activateOp = walletLib.activateWalletOp(
+            WalletLogic.contract.address,
             EntryPoint.contract.address,
             walletOwner.address,
             upgradeDelay,
@@ -330,13 +330,13 @@ describe("WalletContract", function () {
         }
         const code = await ethers.provider.getCode(walletAddress);
         expect(code).to.not.equal('0x');
-        let guardianInfo = await soulWalletLib.Guardian.getGuardian(ethers.provider, walletAddress);
+        let guardianInfo = await walletLib.Guardian.getGuardian(ethers.provider, walletAddress);
 
         expect(guardianInfo?.currentGuardian).to.equal(gurdianAddressAndInitCode.address);
 
         return {
             chainId, accounts, GuardianLogic, SingletonFactory, EntryPoint, TokenPaymaster,
-            soulWalletLib,
+            walletLib,
             bundler,
             walletAddress,
             walletOwner,
@@ -351,7 +351,7 @@ describe("WalletContract", function () {
 
     async function activateWallet_WithUSDCPaymaster() {
         //describe("activate wallet", async () => {
-        const { soulWalletLib, bundler, chainId, accounts, SingletonFactory, walletOwner, SoulWalletLogic, EntryPoint, USDC, DAI, TokenPaymaster, GuardianLogic, WalletFactory } = await loadFixture(deployFixture);
+        const { walletLib, bundler, chainId, accounts, SingletonFactory, walletOwner, WalletLogic, EntryPoint, USDC, DAI, TokenPaymaster, GuardianLogic, WalletFactory } = await loadFixture(deployFixture);
 
         const upgradeDelay = 10;
         const guardianDelay = 10;
@@ -369,7 +369,7 @@ describe("WalletContract", function () {
         }
 
         const guardianSalt = 'saltText<text or bytes32>(USDC)';
-        const gurdianAddressAndInitCode = soulWalletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
+        const gurdianAddressAndInitCode = walletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
         log('guardian address ==> ' + gurdianAddressAndInitCode.address);
         {
             // test guardian order (For user experience, guardian cannot rely on the order of address)
@@ -378,12 +378,12 @@ describe("WalletContract", function () {
             _guardiansAddress[0] = _guardiansAddress[1];
             _guardiansAddress[1] = _guardianTmpItem;
 
-            const _gurdianAddressAndInitCode = soulWalletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, _guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
+            const _gurdianAddressAndInitCode = walletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, _guardiansAddress, Math.round(guardiansAddress.length / 2), guardianSalt);
             expect(_gurdianAddressAndInitCode.address).to.equal(gurdianAddressAndInitCode.address);
         }
 
-        const walletAddress = await soulWalletLib.calculateWalletAddress(
-            SoulWalletLogic.contract.address,
+        const walletAddress = await walletLib.calculateWalletAddress(
+            WalletLogic.contract.address,
             EntryPoint.contract.address,
             walletOwner.address,
             upgradeDelay,
@@ -398,8 +398,8 @@ describe("WalletContract", function () {
 
         // #endregion
 
-        const activateOp = soulWalletLib.activateWalletOp(
-            SoulWalletLogic.contract.address,
+        const activateOp = walletLib.activateWalletOp(
+            walletLogic.contract.address,
             EntryPoint.contract.address,
             walletOwner.address,
             upgradeDelay,
@@ -425,7 +425,7 @@ describe("WalletContract", function () {
                 //value: ethers.utils.parseEther('100').toString()
             }
         ];
-        const approveCallData = soulWalletLib.Tokens.ERC20.getApproveCallData(approveData);
+        const approveCallData = walletLib.Tokens.ERC20.getApproveCallData(approveData);
         activateOp.callData = approveCallData.callData;
         activateOp.callGasLimit = approveCallData.callGasLimit;
         await estimateUserOperationGas(bundler, activateOp);
@@ -437,7 +437,7 @@ describe("WalletContract", function () {
             log('requiredPrefund: ', ethers.utils.formatEther(requiredPrefund), 'ETH');
         }
         // get USDC exchangeRate
-        const exchangePrice = await soulWalletLib.getPaymasterExchangePrice(ethers.provider, TokenPaymaster.contract.address, USDC.contract.address, true);
+        const exchangePrice = await walletLib.getPaymasterExchangePrice(ethers.provider, TokenPaymaster.contract.address, USDC.contract.address, true);
         const tokenDecimals = exchangePrice.tokenDecimals || 6;
         // print price now
         log('exchangePrice: ' + ethers.utils.formatUnits(exchangePrice.price, exchangePrice.decimals), 'USDC/ETH');
@@ -448,7 +448,7 @@ describe("WalletContract", function () {
             .div(BigNumber.from(10).pow(18));
         log('requiredUSDC: ' + ethers.utils.formatUnits(requiredUSDC, tokenDecimals), 'USDC');
         const maxUSDC = requiredUSDC.mul(110).div(100); // 10% more
-        let paymasterAndData = soulWalletLib.getPaymasterData(TokenPaymaster.contract.address, USDC.contract.address, maxUSDC);
+        let paymasterAndData = walletLib.getPaymasterData(TokenPaymaster.contract.address, USDC.contract.address, maxUSDC);
         activateOp.paymasterAndData = paymasterAndData;
         {
             // send maxUSDC USDC to wallet
@@ -457,7 +457,7 @@ describe("WalletContract", function () {
             const usdcBalance = await USDC.contract.balanceOf(walletAddress);
             log('usdcBalance: ' + ethers.utils.formatUnits(usdcBalance, exchangePrice.tokenDecimals), 'USDC');
         }
-        const decoder = soulWalletLib.Utils.DecodeCallData.new();
+        const decoder = walletLib.Utils.DecodeCallData.new();
         const decoded = await decoder.decode(activateOp.callData);
         log("init code", activateOp.initCode);
 
@@ -500,12 +500,12 @@ describe("WalletContract", function () {
 
         const code = await ethers.provider.getCode(walletAddress);
         expect(code).to.not.equal('0x');
-        let guardianInfo = await soulWalletLib.Guardian.getGuardian(ethers.provider, walletAddress);
+        let guardianInfo = await walletLib.Guardian.getGuardian(ethers.provider, walletAddress);
 
         expect(guardianInfo?.currentGuardian).to.equal(gurdianAddressAndInitCode.address);
 
         return {
-            soulWalletLib,
+            walletLib,
             bundler,
             chainId, accounts, GuardianLogic, SingletonFactory, EntryPoint, TokenPaymaster,
             walletAddress,
@@ -520,16 +520,16 @@ describe("WalletContract", function () {
     }
 
     async function transferToken() {
-        const { soulWalletLib, walletAddress, walletOwner, bundler, guardian, guardianDelay, chainId, accounts, GuardianLogic, SingletonFactory, EntryPoint, TokenPaymaster, USDC } = await activateWallet_withETH();
+        const { walletLib, walletAddress, walletOwner, bundler, guardian, guardianDelay, chainId, accounts, GuardianLogic, SingletonFactory, EntryPoint, TokenPaymaster, USDC } = await activateWallet_withETH();
 
-        let nonce = await soulWalletLib.Utils.getNonce(walletAddress, ethers.provider);
+        let nonce = await walletLib.Utils.getNonce(walletAddress, ethers.provider);
 
         await accounts[0].sendTransaction({
             to: walletAddress,
             value: ethers.utils.parseEther('0.001').toHexString()
         });
 
-        const sendETHOP = soulWalletLib.Tokens.ETH.transfer(
+        const sendETHOP = walletLib.Tokens.ETH.transfer(
             walletAddress,
             nonce,
             '0x',
@@ -559,7 +559,7 @@ describe("WalletContract", function () {
         const balanceAfter = await ethers.provider.getBalance(accounts[1].address);
         expect(balanceAfter.sub(balanceBefore).toString()).to.equal(ethers.utils.parseEther('0.0001').toString());
 
-        nonce = await soulWalletLib.Utils.getNonce(walletAddress, ethers.provider);
+        nonce = await walletLib.Utils.getNonce(walletAddress, ethers.provider);
         const rawtx: ITransaction[] = [{
             from: walletAddress,
             to: accounts[1].address,
@@ -576,7 +576,7 @@ describe("WalletContract", function () {
             value: ethers.utils.parseEther('0.0001').toHexString(),
             data: '0x'
         }];
-        const ConvertedOP = soulWalletLib.Utils.fromTransaction(
+        const ConvertedOP = walletLib.Utils.fromTransaction(
             rawtx,
             nonce,
             10000000000,// 100Gwei
@@ -608,8 +608,8 @@ describe("WalletContract", function () {
     }
 
     async function updateGuardian() {
-        const { soulWalletLib, bundler, walletAddress, walletOwner, guardian, guardianDelay, chainId, accounts, GuardianLogic, EntryPoint } = await activateWallet_withETH();
-        let guardianInfo = await soulWalletLib.Guardian.getGuardian(ethers.provider, walletAddress);
+        const { walletLib, bundler, walletAddress, walletOwner, guardian, guardianDelay, chainId, accounts, GuardianLogic, EntryPoint } = await activateWallet_withETH();
+        let guardianInfo = await walletLib.Guardian.getGuardian(ethers.provider, walletAddress);
 
         expect(guardianInfo?.currentGuardian).to.equal(guardian);
         const guardians = [];
@@ -623,11 +623,11 @@ describe("WalletContract", function () {
             guardiansAddress.push(_guardian.address);
         }
         const guardianSalt = 'saltText' + Math.random();
-        const gurdianAddressAndInitCode = soulWalletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, guardiansAddress, Math.round(guardians.length / 2), guardianSalt);
+        const gurdianAddressAndInitCode = walletLib.Guardian.calculateGuardianAndInitCode(GuardianLogic.contract.address, guardiansAddress, Math.round(guardians.length / 2), guardianSalt);
         log('new guardian address ==> ' + gurdianAddressAndInitCode.address);
-        const nonce = await soulWalletLib.Utils.getNonce(walletAddress, ethers.provider);
+        const nonce = await walletLib.Utils.getNonce(walletAddress, ethers.provider);
 
-        const setGuardianOP = soulWalletLib.Guardian.setGuardian(
+        const setGuardianOP = walletLib.Guardian.setGuardian(
             walletAddress,
             gurdianAddressAndInitCode.address,
             nonce,
@@ -642,32 +642,32 @@ describe("WalletContract", function () {
         const setGuardianOPSignature = Utils.signMessage(setGuardianOPuserOpHash, walletOwner.privateKey)
         setGuardianOP.signWithSignature(walletOwner.address, setGuardianOPSignature);
         await EntryPoint.contract.handleOps([setGuardianOP.getStruct()], accounts[0].address);
-        guardianInfo = await soulWalletLib.Guardian.getGuardian(ethers.provider, walletAddress);
+        guardianInfo = await walletLib.Guardian.getGuardian(ethers.provider, walletAddress);
         expect(guardianInfo?.currentGuardian).to.equal(guardian);
         // wait block for guardianDelay 
         await time.increaseTo((await time.latest()) + guardianDelay);
-        guardianInfo = await soulWalletLib.Guardian.getGuardian(ethers.provider, walletAddress, await time.latest());
+        guardianInfo = await walletLib.Guardian.getGuardian(ethers.provider, walletAddress, await time.latest());
         expect(guardianInfo?.currentGuardian).to.equal(gurdianAddressAndInitCode.address);
 
         // test recoveryWallet
-        await _recoveryWallet(soulWalletLib, bundler, guardians, gurdianAddressAndInitCode.initCode, walletAddress, walletOwner, gurdianAddressAndInitCode.address, chainId, accounts, GuardianLogic, EntryPoint);
+        await _recoveryWallet(walletLib, bundler, guardians, gurdianAddressAndInitCode.initCode, walletAddress, walletOwner, gurdianAddressAndInitCode.address, chainId, accounts, GuardianLogic, EntryPoint);
 
 
 
     }
 
     async function recoveryWallet() {
-        const { soulWalletLib, bundler, guardians, guardianInitcode, walletAddress, walletOwner, guardian, chainId, accounts, GuardianLogic, EntryPoint } = await activateWallet_withETH();
-        await _recoveryWallet(soulWalletLib, bundler, guardians, guardianInitcode, walletAddress, walletOwner, guardian, chainId, accounts, GuardianLogic, EntryPoint);
+        const { walletLib, bundler, guardians, guardianInitcode, walletAddress, walletOwner, guardian, chainId, accounts, GuardianLogic, EntryPoint } = await activateWallet_withETH();
+        await _recoveryWallet(walletLib, bundler, guardians, guardianInitcode, walletAddress, walletOwner, guardian, chainId, accounts, GuardianLogic, EntryPoint);
     }
-    async function _recoveryWallet(soulWalletLib: SoulWalletLib, bundler: Bundler, guardians: any[], guardianInitcode: any, walletAddress: string, walletOwner: any, guardian: string, chainId: number, accounts: any[], GuardianLogic: any, EntryPoint: any) {
+    async function _recoveryWallet(walletLib: walletLib, bundler: Bundler, guardians: any[], guardianInitcode: any, walletAddress: string, walletOwner: any, guardian: string, chainId: number, accounts: any[], GuardianLogic: any, EntryPoint: any) {
 
-        let guardianInfo = await soulWalletLib.Guardian.getGuardian(ethers.provider, walletAddress, await time.latest());
+        let guardianInfo = await walletLib.Guardian.getGuardian(ethers.provider, walletAddress, await time.latest());
         expect(guardianInfo?.currentGuardian).to.equal(guardian);
 
-        const nonce = await soulWalletLib.Utils.getNonce(walletAddress, ethers.provider);
+        const nonce = await walletLib.Utils.getNonce(walletAddress, ethers.provider);
         const newWalletOwner = await ethers.Wallet.createRandom();
-        const transferOwnerOP = soulWalletLib.Guardian.transferOwner(
+        const transferOwnerOP = walletLib.Guardian.transferOwner(
             walletAddress,
             nonce,
             '0x',
@@ -695,7 +695,7 @@ describe("WalletContract", function () {
                 }
             );
         }
-        const signature = soulWalletLib.Guardian.packGuardiansSignByInitCode(guardian, guardianSignArr, guardianInitcode);
+        const signature = walletLib.Guardian.packGuardiansSignByInitCode(guardian, guardianSignArr, guardianInitcode);
         transferOwnerOP.signature = signature;
 
 
@@ -724,7 +724,7 @@ describe("WalletContract", function () {
         }
 
 
-        const walletContract = new ethers.Contract(walletAddress, SoulWallet__factory.abi, ethers.provider);
+        const walletContract = new ethers.Contract(walletAddress, Wallet__factory.abi, ethers.provider);
         expect(await walletContract.isOwner(walletOwner.address)).to.equal(true);
         await EntryPoint.contract.handleOps([transferOwnerOP.getStruct()], accounts[0].address);
         expect(await walletContract.isOwner(walletOwner.address)).to.equal(false);
@@ -736,7 +736,7 @@ describe("WalletContract", function () {
         const { walletAddress } = await activateWallet_WithUSDCPaymaster();
         const walletContract = new ethers.Contract(
             walletAddress,
-            SoulWallet__factory.abi,
+            Wallet__factory.abi,
             ethers.provider
         );
 
@@ -763,8 +763,8 @@ describe("WalletContract", function () {
         expect(support).to.equal(false);
         await expect(
             await walletContract.callStatic.onERC1155Received(
-                SoulWalletLib.Defines.AddressZero,
-                SoulWalletLib.Defines.AddressZero,
+                WalletLib.Defines.AddressZero,
+                WalletLib.Defines.AddressZero,
                 0,
                 0,
                 "0x"
@@ -772,8 +772,8 @@ describe("WalletContract", function () {
         ).to.be.eq("0xf23a6e61");
         await expect(
             await walletContract.callStatic.onERC1155BatchReceived(
-                SoulWalletLib.Defines.AddressZero,
-                SoulWalletLib.Defines.AddressZero,
+                WalletLib.Defines.AddressZero,
+                WalletLib.Defines.AddressZero,
                 [0],
                 [0],
                 "0x"
@@ -783,7 +783,7 @@ describe("WalletContract", function () {
 
     async function signatureTest() {
 
-        const { soulWalletLib, SignatureTest } = await loadFixture(deployFixture);
+        const { walletLib, SignatureTest } = await loadFixture(deployFixture);
 
         const uint48_max = 281474976710655;
 
@@ -808,7 +808,7 @@ describe("WalletContract", function () {
                 }
             }
             // random aggregator
-            let aggregator = SoulWalletLib.Defines.AddressZero;
+            let aggregator = WalletLib.Defines.AddressZero;
             if (Math.random() > 0.5) {
                 aggregator = ethers.utils.getAddress(ethers.utils.hexlify(ethers.utils.randomBytes(20)));
             }
@@ -833,8 +833,8 @@ describe("WalletContract", function () {
     }
 
     async function coverageTest() {
-        const { soulWalletLib, walletAddress, walletOwner, guardian, guardianDelay, chainId, accounts, GuardianLogic, SingletonFactory, EntryPoint, USDC } = await activateWallet_WithUSDCPaymaster();
-        const walletContract = new ethers.Contract(walletAddress, SoulWallet__factory.abi, ethers.provider);
+        const { walletLib, walletAddress, walletOwner, guardian, guardianDelay, chainId, accounts, GuardianLogic, SingletonFactory, EntryPoint, USDC } = await activateWallet_WithUSDCPaymaster();
+        const walletContract = new ethers.Contract(walletAddress, Wallet__factory.abi, ethers.provider);
 
         // getVersion
         const version = await walletContract.getVersion();
@@ -857,9 +857,9 @@ describe("WalletContract", function () {
             } catch (error) { }
         }
         {
-            const packedHash = soulWalletLib.EIP1271.packHashMessageWithTimeRange(hashMsg, walletOwner.address);
+            const packedHash = walletLib.EIP1271.packHashMessageWithTimeRange(hashMsg, walletOwner.address);
             const signature = Utils.signMessage(packedHash, walletOwner.privateKey);
-            const packedSignature = soulWalletLib.EIP1271.encodeSignature(walletOwner.address, signature);
+            const packedSignature = walletLib.EIP1271.encodeSignature(walletOwner.address, signature);
             const selector = await walletContract.isValidSignature(
                 hashMsg,
                 packedSignature
@@ -870,9 +870,9 @@ describe("WalletContract", function () {
             const block = await ethers.provider.getBlock("latest");
             const validStart = block.timestamp - 1000;
             const validEnd = block.timestamp + 1000;
-            const packedHash = soulWalletLib.EIP1271.packHashMessageWithTimeRange(hashMsg, walletOwner.address, validStart, validEnd);
+            const packedHash = walletLib.EIP1271.packHashMessageWithTimeRange(hashMsg, walletOwner.address, validStart, validEnd);
             const signature = Utils.signMessage(packedHash, walletOwner.privateKey);
-            const packedSignature = soulWalletLib.EIP1271.encodeSignature(walletOwner.address, signature, validStart, validEnd);
+            const packedSignature = walletLib.EIP1271.encodeSignature(walletOwner.address, signature, validStart, validEnd);
             const selector = await walletContract.isValidSignature(
                 hashMsg,
                 packedSignature
@@ -883,9 +883,9 @@ describe("WalletContract", function () {
             const block = await ethers.provider.getBlock("latest");
             const validEnd = block.timestamp - 1;
 
-            const packedHash = soulWalletLib.EIP1271.packHashMessageWithTimeRange(hashMsg, walletOwner.address, 0, validEnd);
+            const packedHash = walletLib.EIP1271.packHashMessageWithTimeRange(hashMsg, walletOwner.address, 0, validEnd);
             const signature = Utils.signMessage(packedHash, walletOwner.privateKey);
-            const packedSignature = soulWalletLib.EIP1271.encodeSignature(walletOwner.address, signature, 0, validEnd);
+            const packedSignature = walletLib.EIP1271.encodeSignature(walletOwner.address, signature, 0, validEnd);
             const selector = await walletContract.isValidSignature(
                 hashMsg,
                 packedSignature
