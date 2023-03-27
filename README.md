@@ -28,7 +28,7 @@ Below is a brief overview of the repository contracts
   1. The initial guardian settings take effect immediately. If guardians are updated, there is a time lock, meaning that changes will only take effect after the set time has passed.
   2. During social recovery, an anonymous guardian multi-signature contract is deployed, and the guardian's signatures are verified. If the signatures are all correct, social recovery is successful, and the signing key of the wallet contract is replaced.
   3. Execute transactions from the entry point, the wallet contract will first verify the transaction or user operation signature and then execute the call to the target contract.
-+ Upgradability: The smart contract for this wallet can be upgraded in a secure way to add new features or fix vulnerabilities in the future. SoulWallet can be upgraded to a new logic contract. The upgrade process also has a time lock, which means that the upgrade can only be successful after the set time has passed.
++ Upgradability: The smart contract for this wallet can be upgraded in a secure way to add new features or fix vulnerabilities in the future. Wallet can be upgraded to a new logic contract. The upgrade process also has a time lock, which means that the upgrade can only be successful after the set time has passed.
 
 | Method                        | Owner  | Guardians| Anyone | Comment                                                                                         |
 | ----------------------------  | ------ | ------   | ------ | ----------------------------------------------------------------------------------------------- |
