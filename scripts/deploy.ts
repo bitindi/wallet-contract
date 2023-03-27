@@ -739,7 +739,7 @@ async function main() {
       if (activated && !isLocalTestnet()) {
 
         let iface = new ethers.utils.Interface(Wallet__factory.abi);
-        let initializeData = iface.encodeFunctionData("initialize", [EntryPointAddress, walletOwner, upgradeDelay, guardianDelay, SoulWalletLib.Defines.AddressZero,]);
+        let initializeData = iface.encodeFunctionData("initialize", [EntryPointAddress, walletOwner, upgradeDelay, guardianDelay, WalletLib.Defines.AddressZero,]);
 
         await new Promise(r => setTimeout(r, 5000));
         debugger;
