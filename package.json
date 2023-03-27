@@ -1,5 +1,5 @@
 {
-  "name": "soulwallet-contract",
+  "name": "wallet-contract",
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test test/test.ts",
